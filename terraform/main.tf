@@ -79,7 +79,7 @@ locals {
 
 resource "aws_ssmquicksetup_configuration_manager" "ssm_qs_cm" {
   count       = var.PATCHGROUP_COUNT
-  name        = "GoAnywhere-${var.ENV}-${count.index + 1}"
+  name        = "Windows-VM-${var.ENV}-${count.index + 1}"
   description = "Patchgroup ${count.index + 1}"
 
   configuration_definition {
