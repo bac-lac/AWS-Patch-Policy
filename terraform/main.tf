@@ -77,8 +77,8 @@ locals {
   sat = var.ENV == "prod" ? 4 : 3
 }
 
-resource "aws_ssmquicksetup_configuration_manager" "goanywhere_ssm" {
-  count       = 2
+resource "aws_ssmquicksetup_configuration_manager" "ssm_qs_cm" {
+  count       = var.PATCHGROUP_COUNT
   name        = "GoAnywhere-${var.ENV}-${count.index + 1}"
   description = "Patchgroup ${count.index + 1}"
 
@@ -102,7 +102,7 @@ resource "aws_ssmquicksetup_configuration_manager" "goanywhere_ssm" {
 
       PatchBaselineRegion                       = "ca-central-1"
       PatchBaselineUseDefault                   = "custom"
-      PatchPolicyName                           = "GoAnywhere-${var.ENV}-${count.index + 1}"
+      PatchPolicyName                           = "Windows-VM-${var.ENV}-${count.index + 1}"
 
       RateControlConcurrency                    = "100%"
       RateControlErrorThreshold                 = "33%"
@@ -123,7 +123,7 @@ resource "aws_ssmquicksetup_configuration_manager" "goanywhere_ssm" {
 
 # SSM S3 Bucket
 resource "aws_s3_bucket" "ssm_s3" {
-  bucket        = "ssm-goanywhere-${var.ENV}"
+  bucket        = "ssm-patch-policy-${var.ENV}"
   force_destroy = true
 }
 
@@ -142,7 +142,7 @@ resource "aws_s3_bucket_public_access_block" "ssm_public_access_block" {
   restrict_public_buckets = true
 }
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
+resource "aws_s3_bucket_server_side_encryption_configuration" "s3_encryption" {
   bucket = aws_s3_bucket.ssm_s3.id
   rule {
     apply_server_side_encryption_by_default {
@@ -165,9 +165,9 @@ data "aws_iam_policy_document" "qs_exec_assume_role" {
 }
 
 resource "aws_iam_role" "ssm_qs_exec_role" {
-  name               = "AWS-QuickSetup-GA-LocalExecutionRole-${var.ENV}"
+  name               = "AWS-QuickSetup-VM-LocalExecutionRole-${var.ENV}"
   assume_role_policy = data.aws_iam_policy_document.qs_exec_assume_role.json
-  description        = "Local Execution role for AWS SSM Quick Setup (GA)"
+  description        = "Local Execution role for AWS SSM Quick Setup (VM)"
 }
 
 resource "aws_iam_role_policy_attachment" "ssm_qs_exec_attach" {
@@ -176,8 +176,8 @@ resource "aws_iam_role_policy_attachment" "ssm_qs_exec_attach" {
 }
 
 resource "aws_iam_role" "ssm_qs_admin_role" {
-  name        = "AWS-QuickSetup-GA-LocalAdministrationRole-${var.ENV}"
-  description = "Local Admin role for AWS SSM Quick Setup (GA)"
+  name        = "AWS-QuickSetup-VM-LocalAdministrationRole-${var.ENV}"
+  description = "Local Admin role for AWS SSM Quick Setup (VM)"
   assume_role_policy = jsonencode({
     Version   = "2012-10-17",
     Statement = [
@@ -210,7 +210,7 @@ data "aws_iam_policy_document" "ssm_qs_admin_permissions" {
 }
 
 resource "aws_iam_policy" "qs_admin_policy" {
-  name        = "AWS-QuickSetup-GA-LocalAdministrationRole-policy-${var.ENV}"
+  name        = "AWS-QuickSetup-VM-LocalAdministrationRole-policy-${var.ENV}"
   description = "Permissions for Quick Setup local admin role"
   policy      = data.aws_iam_policy_document.ssm_qs_admin_permissions.json
 }
@@ -308,6 +308,12 @@ variable "EXTERNAL_ID" {
   sensitive = true
   description = "External ID of the automation account role."
   default = "EXTERNAL_ID"
+}
+
+variable "PATCHGROUP_COUNT" {
+  type = number
+  description = "Number of patch groups to create."
+  default = 1
 }
 
 variable "ROLE_ARN" {
