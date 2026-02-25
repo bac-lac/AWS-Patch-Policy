@@ -61,14 +61,10 @@ jobs:
         with:
           terraform_wrapper: true
 
-      
-        
       - name: Terraform-Init
         id: Init
         run: terraform init
-      - name: Ensure default workspace
-        run: |
-          terraform workspace select ${{ inputs.environment }} || terraform workspace new ${{ inputs.environment }}
+
       - name: Terraform-Apply
         id: Apply
         run: terraform apply -var="ACCOUNT=${{ secrets.ACCOUNT }}" -var="ENV=${{ inputs.environment }}" -var="EXTERNAL_ID=${{ secrets.EXTERNAL_ID }}" -var="PATCHGROUP_COUNT=${{ vars.PATCHGROUP_COUNT }}" -var="ROLE_ARN=${{ secrets.ROLE_ARN }}" -auto-approve
