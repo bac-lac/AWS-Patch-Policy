@@ -61,9 +61,9 @@ jobs:
         with:
           terraform_wrapper: true
 
-      # - name: Ensure default workspace
-      #   run: |
-      #     terraform workspace select ${{ inputs.environment }} || terraform workspace new ${{ inputs.environment }}
+      - name: Ensure default workspace
+        run: |
+          terraform workspace select ${{ inputs.environment }} || terraform workspace new ${{ inputs.environment }}
         
       - name: Terraform-Init
         id: Init
