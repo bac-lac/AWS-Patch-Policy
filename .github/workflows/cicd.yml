@@ -53,7 +53,7 @@ jobs:
           audience: sts.amazonaws.com
       
       - name: Export token
-        run: echo "JFROG_TOKEN=${{ secrets.JFROG_TOKEN }}" >> $GITHUB_ENV    
+        run: echo "TF_TOKEN_artifacts-artefacts_devops_cloud-nuage_canada.ca=${{ secrets.JFROG_TOKEN }}" >> $GITHUB_ENV    
       
       - name: Terraform-Setup
         id: Setup
