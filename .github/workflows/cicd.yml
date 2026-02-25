@@ -51,7 +51,11 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
           role-skip-session-tagging: true
           audience: sts.amazonaws.com
-
+      
+      - name: Ensure default workspace
+        run: |
+          terraform workspace select ${{ inputs.environment }} || terraform workspace new ${{ inputs.environment }}
+          
       - name: Terraform-Setup
         id: Setup
         uses: hashicorp/setup-terraform@v3
@@ -60,10 +64,8 @@ jobs:
 
       - name: Terraform-Init
         id: Init
-        run: terraform init 
-          -backend-config="dynamodb_table=main-tfstate-lock-1a6f390e" 
-          -backend-config="key=${{ inputs.environment }}/vm-patch-policy/terraform.tfstate"
+        run: terraform init
 
       - name: Terraform-Apply
         id: Apply
-        run: terraform apply -var="ACCOUNT=${{ secrets.ACCOUNT }}" -var="ENV=${{ inputs.environment }}" -var="EXTERNAL_ID=${{ secrets.EXTERNAL_ID }}" -var="PATCHGROUP_COUNT=${{ secrets.PATCHGROUP_COUNT }}" -var="ROLE_ARN=${{ secrets.ROLE_ARN }}" -auto-approve
+        run: terraform plan -var="ACCOUNT=${{ secrets.ACCOUNT }}" -var="ENV=${{ inputs.environment }}" -var="EXTERNAL_ID=${{ secrets.EXTERNAL_ID }}" -var="PATCHGROUP_COUNT=${{ secrets.PATCHGROUP_COUNT }}" -var="ROLE_ARN=${{ secrets.ROLE_ARN }}" -auto-approve

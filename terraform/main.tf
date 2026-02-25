@@ -6,10 +6,12 @@ terraform {
     }
   }
 
-  backend "s3" {
-    bucket      = "main-tfstate-c71307a3"
-    region      = "ca-central-1"
-    encrypt     = true
+  backend "remote" {
+    hostname = "artifacts-artefacts.devops.cloud-nuage.canada.ca"
+    organization = "lac-pp-tf-local"
+    workspaces {
+        prefix = "aws-patch-policy-"
+    }
   }
 }
 
@@ -288,6 +290,24 @@ data "aws_iam_policy_document" "ssm_s3_permissions" {
 resource "aws_s3_bucket_policy" "ssm_s3_policy" {
   bucket = aws_s3_bucket.ssm_s3.id
   policy = data.aws_iam_policy_document.ssm_s3_permissions.json
+}
+
+# SSM IAM ROLE
+resource "aws_iam_role" "ssm_role" {
+  name          = "SSMRole-${var.ENV}"
+  description   = "Provides access to S3 for SSM"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        },
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
 }
 
 variable "ACCOUNT" {
