@@ -48,13 +48,13 @@ jobs:
         with:
           terraform_wrapper: true
 
-      - name: Terraform-Init
-        id: Init
-        run: terraform init
-
       - name: Ensure default workspace
         run: |
           terraform workspace select ${{ inputs.environment }}
+
+      - name: Terraform-Init
+        id: Init
+        run: terraform init
 
       - name: Terraform-Destroy
         id: Destroy
