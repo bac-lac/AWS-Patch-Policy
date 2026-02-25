@@ -39,22 +39,16 @@ jobs:
           role-skip-session-tagging: true
           audience: sts.amazonaws.com
 
-      - name: Export token
-        run: echo "TF_TOKEN_artifacts-artefacts_devops_cloud-nuage_canada.ca=${{ secrets.JFROG_TOKEN }}" >> $GITHUB_ENV
-
       - name: Terraform-Setup
         id: Setup
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_wrapper: true
 
-      - name: Ensure default workspace
-        run: |
-          terraform workspace select ${{ inputs.environment }}
-
       - name: Terraform-Init
         id: Init
         run: terraform init
+          -backend-config="key=${{ inputs.environment }}/patch-policy/terraform.tfstate"
 
       - name: Terraform-Destroy
         id: Destroy
