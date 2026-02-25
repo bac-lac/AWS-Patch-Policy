@@ -51,10 +51,6 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
           role-skip-session-tagging: true
           audience: sts.amazonaws.com
-      
-      - name: Ensure default workspace
-        run: |
-          terraform workspace select ${{ inputs.environment }} || terraform workspace new ${{ inputs.environment }}
           
       - name: Terraform-Setup
         id: Setup
@@ -62,6 +58,10 @@ jobs:
         with:
           terraform_wrapper: true
 
+      - name: Ensure default workspace
+        run: |
+          terraform workspace select ${{ inputs.environment }} || terraform workspace new ${{ inputs.environment }}
+        
       - name: Terraform-Init
         id: Init
         run: terraform init
