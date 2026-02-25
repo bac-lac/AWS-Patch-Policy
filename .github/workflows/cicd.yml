@@ -71,4 +71,4 @@ jobs:
 
       - name: Terraform-Apply
         id: Apply
-        run: terraform plan -var="ACCOUNT=${{ secrets.ACCOUNT }}" -var="ENV=${{ inputs.environment }}" -var="EXTERNAL_ID=${{ secrets.EXTERNAL_ID }}" -var="PATCHGROUP_COUNT=${{ secrets.PATCHGROUP_COUNT }}" -var="ROLE_ARN=${{ secrets.ROLE_ARN }}" -auto-approve
+        run: terraform plan -var="ACCOUNT=${{ secrets.ACCOUNT }}" -var="ENV=${{ inputs.environment }}" -var="EXTERNAL_ID=${{ secrets.EXTERNAL_ID }}" -var="PATCHGROUP_COUNT=${{ secrets.PATCHGROUP_COUNT }}" -var="ROLE_ARN=${{ secrets.ROLE_ARN }}"
