@@ -80,7 +80,7 @@ locals {
 
 resource "aws_ssmquicksetup_configuration_manager" "ssm_qs_cm" {
   count       = var.PATCHGROUP_COUNT
-  name        = "Windows-VM-${var.ENV}-${count.index + 1}"
+  name        = "Windows-PatchPolicy-${var.ENV}-${count.index + 1}"
   description = "Patchgroup ${count.index + 1}"
 
   configuration_definition {
@@ -103,7 +103,7 @@ resource "aws_ssmquicksetup_configuration_manager" "ssm_qs_cm" {
 
       PatchBaselineRegion                       = "ca-central-1"
       PatchBaselineUseDefault                   = "custom"
-      PatchPolicyName                           = "Windows-VM-${var.ENV}-${count.index + 1}"
+      PatchPolicyName                           = "Windows-PatchPolicy-${var.ENV}-${count.index + 1}"
 
       RateControlConcurrency                    = "100%"
       RateControlErrorThreshold                 = "33%"
@@ -166,9 +166,9 @@ data "aws_iam_policy_document" "qs_exec_assume_role" {
 }
 
 resource "aws_iam_role" "ssm_qs_exec_role" {
-  name               = "AWS-QuickSetup-VM-LocalExecutionRole-${var.ENV}"
+  name               = "AWS-QuickSetup-PatchPolicy-LocalExecutionRole-${var.ENV}"
   assume_role_policy = data.aws_iam_policy_document.qs_exec_assume_role.json
-  description        = "Local Execution role for AWS SSM Quick Setup (VM)"
+  description        = "Local Execution role for AWS SSM Quick Setup (PatchPolicy)"
 }
 
 resource "aws_iam_role_policy_attachment" "ssm_qs_exec_attach" {
@@ -177,8 +177,8 @@ resource "aws_iam_role_policy_attachment" "ssm_qs_exec_attach" {
 }
 
 resource "aws_iam_role" "ssm_qs_admin_role" {
-  name        = "AWS-QuickSetup-VM-LocalAdministrationRole-${var.ENV}"
-  description = "Local Admin role for AWS SSM Quick Setup (VM)"
+  name        = "AWS-QuickSetup-PatchPolicy-LocalAdministrationRole-${var.ENV}"
+  description = "Local Admin role for AWS SSM Quick Setup (PatchPolicy)"
   assume_role_policy = jsonencode({
     Version   = "2012-10-17",
     Statement = [
@@ -211,7 +211,7 @@ data "aws_iam_policy_document" "ssm_qs_admin_permissions" {
 }
 
 resource "aws_iam_policy" "qs_admin_policy" {
-  name        = "AWS-QuickSetup-VM-LocalAdministrationRole-policy-${var.ENV}"
+  name        = "AWS-QuickSetup-PatchPolicy-LocalAdministrationRole-policy-${var.ENV}"
   description = "Permissions for Quick Setup local admin role"
   policy      = data.aws_iam_policy_document.ssm_qs_admin_permissions.json
 }
