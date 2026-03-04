@@ -126,6 +126,8 @@ resource "aws_ssmquicksetup_configuration_manager" "ssm_qs_cm" {
 resource "aws_s3_bucket" "ssm_s3" {
   bucket        = "ssm-patch-policy-${var.ENV}"
   force_destroy = true
+  # No real dependencies, but this ensures the iam role policies are attached before the quick setup configuration is created
+  depends_on  = [aws_iam_role_policy_attachment.ssm_qs_exec_attach, aws_iam_role_policy_attachment.qs_admin_attach]
 }
 
 resource "aws_s3_bucket_versioning" "ssm_versioning" {
